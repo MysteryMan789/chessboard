@@ -49,7 +49,7 @@
         // Fetch board from backend on load
         async function syncBoard() {
             try {
-                const response = await fetch('http://127.0.0.1:5000/board');
+                const response = await fetch('https://chess-backend-psk7.onrender.com/board');
                 const data = await response.json();
                 board.position(fenToPosition(data.board));
             } catch (error) {
@@ -73,7 +73,7 @@
             }
 
             try {
-                const response = await fetch('http://127.0.0.1:5000/validate_move', {
+                const response = await fetch('https://chess-backend-psk7.onrender.com/validate_move', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ move: move })
@@ -118,7 +118,7 @@
 
         async function resetBoard() {
             try {
-                const response = await fetch('http://127.0.0.1:5000/reset', { method: 'POST' });
+                const response = await fetch('https://chess-backend-psk7.onrender.com/reset', { method: 'POST' });
                 const data = await response.json();
                 board.position(fenToPosition(data.new_board));
             } catch (error) {
@@ -141,7 +141,7 @@
         const square = $(this).parent().attr('data-square');
 
         try {
-            const res = await fetch('http://127.0.0.1:5000/legal_moves', {
+            const res = await fetch('https://chess-backend-psk7.onrender.com/legal_moves', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ square })
@@ -171,3 +171,4 @@
     </script>
 </body>
 </html>
+
