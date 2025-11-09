@@ -31,7 +31,42 @@
             left: 35%;
             pointer-events: none;
         }
-
+        #moveTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        #moveTable thead th {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            font-weight: bold;
+            border-bottom: 2px solid #388E3C;
+        }
+        
+        #moveTable tbody tr {
+            transition: background-color 0.3s;
+        }
+        
+        #moveTable tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        #moveTable tbody tr:hover {
+            background-color: #d1ffd1;
+        }
+        
+        #moveTable td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        h3 {
+            font-family:"Helvetica", sans-serif;
+        }
     </style>
 </head>
 <body>
@@ -93,6 +128,9 @@
             if (index >= 0 && index < moves.length) {
                 board.position(fenToPosition(moves[index].fen));
                 currentIndex = index;
+                document.querySelectorAll('#moveTable tbody tr').forEach(r => r.classList.remove('active'));
+                const rowIndex = Math.floor(index / 2);
+                document.querySelector(`#moveTable tbody tr:nth-child(${rowIndex + 1})`)?.classList.add('active');
             }
         }
         async function syncBoard() {
@@ -241,6 +279,7 @@
     </script>
 </body>
 </html>
+
 
 
 
