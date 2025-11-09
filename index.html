@@ -39,18 +39,6 @@
     <button onclick="resetBoard()">Reset Board</button>
 
     <script>
-        async function wakeBackend() {
-            try {
-                await fetch('https://chess-backend-psk7.onrender.com/board');
-            } catch (err) {
-                console.error('Failed to wake backend:', err);
-            }
-        }
-        
-        wakeBackend();
-        
-        setInterval(wakeBackend, 10 * 60 * 1000);
-
         let history = [];
         let currentIndex = 0;
         var board = Chessboard('board', {
@@ -203,6 +191,7 @@
     </script>
 </body>
 </html>
+
 
 
 
