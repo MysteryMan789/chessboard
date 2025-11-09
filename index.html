@@ -37,9 +37,21 @@
 <body>
     <div id="board" style="width:400px;"></div>
     <button onclick="resetBoard()">Reset Board</button>
-
+    <h3>Move List</h3>
+    <table id="moveTable" border="1" cellpadding="5" style="border-collapse:collapse; margin-top:10px;">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>White</th>
+                <th>Black</th>
+            </tr>
+        </thead>
+        <tbody id="moveBody">
+        </tbody>
+    </table>
     <script>
         let history = [];
+        let moves = [];
         let currentIndex = 0;
         var board = Chessboard('board', {
             orientation: 'white',
@@ -48,8 +60,43 @@
             pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
             onDrop: onDrop
         });
-
-        // Fetch board from backend on load
+        function updateMoveTable() {
+            const tbody = document.getElementById('moveBody');
+            tbody.innerHTML = '';
+            
+            for (let i = 0; i < moves.length; i += 2) {
+                const row = document.createElement('tr');
+                const numCell = document.createElement('td');
+                const whiteCell = document.createElement('td');
+                const blackCell = document.createElement('td');
+        
+                numCell.textContent = (i / 2) + 1;
+                whiteCell.textContent = moves[i]?.move || '';
+                blackCell.textContent = moves[i + 1]?.move || '';
+        
+                // Allow clicking on a move to jump to that position
+                whiteCell.onclick = () => loadPosition(i);
+                blackCell.onclick = () => loadPosition(i + 1);
+        
+                whiteCell.style.cursor = 'pointer';
+                blackCell.style.cursor = 'pointer';
+                whiteCell.style.color = 'blue';
+                blackCell.style.color = 'blue';
+        
+                row.appendChild(numCell);
+                row.appendChild(whiteCell);
+                row.appendChild(blackCell);
+                tbody.appendChild(row);
+            }
+        }
+        function loadPosition(index) {
+            if (index >= 0 && index < moves.length) {
+                board.position(fenToPosition(moves[index].fen));
+                currentIndex = index;
+            }
+        }
+        whiteCell.onclick = () => loadPosition(i);
+        blackCell.onclick = () => loadPosition(i + 1);
         async function syncBoard() {
             try {
                 const response = await fetch('https://chess-backend-psk7.onrender.com/board');
@@ -67,8 +114,7 @@
             clearMoveCircles();
             const oldPosition = board.position();
             let move = source + target;
-
-            // Handle pawn promotion
+        
             const rank = target[1];
             if ((piece === 'wP' && rank === '8') || (piece === 'bP' && rank === '1')) {
                 let promo = prompt("Promote to (q, r, b, n):", "q");
@@ -76,32 +122,38 @@
                 if (!["q","r","b","n"].includes(promo)) promo = "q";
                 move += promo;
             }
-
+        
             try {
                 const response = await fetch('https://chess-backend-psk7.onrender.com/validate_move', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ move: move })
+                    body: JSON.stringify({ move })
                 });
                 const data = await response.json();
-
+        
                 if (!response.ok || data.error) {
                     console.log('Illegal move:', data.error);
                     board.position(oldPosition, false);
                     return;
                 }
-
+        
                 board.position(fenToPosition(data.new_board));
+        
+                const san = data.san || move;
+                moves.push({ move: san, fen: data.new_board });
+        
+                updateMoveTable();
+        
                 history = history.slice(0, currentIndex + 1);
                 history.push(data.new_board);
                 currentIndex = history.length - 1;
-
-
+        
             } catch (error) {
                 console.error('Network error:', error);
                 board.position(oldPosition, false);
             }
         }
+
 
         function fenToPosition(fen) {
             const position = {};
@@ -191,6 +243,7 @@
     </script>
 </body>
 </html>
+
 
 
 
