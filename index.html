@@ -54,6 +54,8 @@
                 const response = await fetch('https://chess-backend-psk7.onrender.com/board');
                 const data = await response.json();
                 board.position(fenToPosition(data.board));
+                history = [data.board];
+                currentIndex = 0;
             } catch (error) {
                 console.error('Failed to sync board:', error);
             }
@@ -188,5 +190,6 @@
     </script>
 </body>
 </html>
+
 
 
