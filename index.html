@@ -38,6 +38,8 @@
     <button onclick="resetBoard()">Reset Board</button>
 
     <script>
+        let history = [];
+        let currentIndex = 0;
         var board = Chessboard('board', {
             orientation: 'white',
             position: 'start',
@@ -87,6 +89,10 @@
                 }
 
                 board.position(fenToPosition(data.new_board));
+                history = history.slice(0, currentIndex + 1);
+                history.push(data.new_board);
+                currentIndex = history.length - 1;
+
 
             } catch (error) {
                 console.error('Network error:', error);
@@ -121,54 +127,66 @@
                 const response = await fetch('https://chess-backend-psk7.onrender.com/reset', { method: 'POST' });
                 const data = await response.json();
                 board.position(fenToPosition(data.new_board));
+                history = [data.new_board];
+                currentIndex = 0;
             } catch (error) {
                 console.error('Failed to reset board:', error);
             }
         }
         let circles = [];
 
-        // Remove all move circles
         function clearMoveCircles() {
             circles.forEach(el => el.remove());
             circles = [];
         }
 
-        // When user clicks on a piece
         $('#board').on('mousedown', '.piece-417db', async function (e) {
-        clearMoveCircles();
-
-        // get the clicked square
-        const square = $(this).parent().attr('data-square');
-
-        try {
-            const res = await fetch('https://chess-backend-psk7.onrender.com/legal_moves', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ square })
-            });
-            const data = await res.json();
-
-            if (data.moves) {
-            data.moves.forEach(dest => {
-                const squareEl = $(`.square-${dest}`);
-                if (squareEl.length) {
-                const circle = $('<div class="move-circle"></div>');
-                squareEl.css('position', 'relative').append(circle);
-                circles.push(circle[0]);
+            clearMoveCircles();
+    
+            const square = $(this).parent().attr('data-square');
+    
+            try {
+                const res = await fetch('https://chess-backend-psk7.onrender.com/legal_moves', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ square })
+                });
+                const data = await res.json();
+    
+                if (data.moves) {
+                    data.moves.forEach(dest => {
+                        const squareEl = $(`.square-${dest}`);
+                        if (squareEl.length) {
+                        const circle = $('<div class="move-circle"></div>');
+                        squareEl.css('position', 'relative').append(circle);
+                        circles.push(circle[0]);
+                        }
+                    });
                 }
-            });
+            } catch (err) {
+                console.error('Error fetching legal moves:', err);
             }
-        } catch (err) {
-            console.error('Error fetching legal moves:', err);
-        }
+        });
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'ArrowLeft') {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    board.position(fenToPosition(history[currentIndex]));
+                }
+            } else if (event.key === 'ArrowRight') {
+                if (currentIndex < history.length - 1) {
+                    currentIndex++;
+                    board.position(fenToPosition(history[currentIndex]));
+                }
+            }
         });
 
-        // When piece is dropped or mouse released anywhere
         $('#board').on('mouseup', function () {
-        clearMoveCircles();
+            clearMoveCircles();
         });
 
     </script>
 </body>
 </html>
+
 
