@@ -220,6 +220,8 @@
                 board.position(fenToPosition(data.new_board));
                 history = [data.new_board];
                 currentIndex = 0;
+                moves = [];
+                updateMoveTable();
             } catch (error) {
                 console.error('Failed to reset board:', error);
             }
@@ -279,6 +281,7 @@
     </script>
 </body>
 </html>
+
 
 
 
