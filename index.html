@@ -84,10 +84,12 @@
         <tbody id="moveBody">
         </tbody>
     </table>
+    <button id="pgn-export">Copy PGN to clipboard</button>
     <script>
         let history = [];
         let moves = [];
         let currentIndex = 0;
+        const pgnExport = document.getElementById('pgn-export');
         var board = Chessboard('board', {
             orientation: 'white',
             position: 'start',
@@ -190,7 +192,31 @@
             }
         }
 
+        pgnExport.addEventListener("click", function() {
+            let pgnMoves = "";
 
+            for (let i = 0; i < moves.length; i++) {
+                if (i % 2 === 0) {
+                    pgnMoves += (Math.floor(i / 2) + 1) + ". ";
+                }
+                pgnMoves += moves[i].move + " ";
+            }
+
+            const today = new Date().toISOString().split('T')[0].replace(/-/g, '.');
+
+            let pgn =
+            `[Event "Online board simulator"]
+            [Site "https://mysteryman789.github.io/chessboard/"]
+            [Date "${today}"]
+            [White "White"]
+            [Black "Black"]
+            [Result "*"]
+
+            ${pgnMoves}*`;
+
+            navigator.clipboard.writeText(pgn);
+            pgnExport.textContent = "Copied PGN to clipboard!";
+        });
         function fenToPosition(fen) {
             const position = {};
             const rows = fen.split(' ')[0].split('/');
@@ -281,13 +307,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
