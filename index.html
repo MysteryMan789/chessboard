@@ -67,6 +67,25 @@
         h3 {
             font-family:"Helvetica", sans-serif;
         }
+        #eval-container {
+            width: 20px;
+            height: 400px;
+            border: 2px solid black;
+            position: relative;
+            margin-left: 10px;
+            display: inline-block;
+            vertical-align: top;
+            background: black;
+        }
+
+        #eval-bar {
+            width: 100%;
+            height: 50%;
+            background: white;
+            position: absolute;
+            bottom: 0;
+            transition: height 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -84,12 +103,20 @@
         <tbody id="moveBody">
         </tbody>
     </table>
+    <div id="eval-container">
+        <div id="eval-bar"></div>
+    </div>
+    <div id="eval">0.00</div>
     <button id="pgn-export">Copy PGN to clipboard</button>
     <script>
         let history = [];
         let moves = [];
         let currentIndex = 0;
         const pgnExport = document.getElementById('pgn-export');
+        const engine = new Worker('https://cdn.jsdelivr.net/npm/stockfish@16/stockfish.js');
+        engine.postMessage("uci");
+        engine.postMessage("isready");
+        let evalText;
         var board = Chessboard('board', {
             orientation: 'white',
             position: 'start',
@@ -97,6 +124,47 @@
             pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
             onDrop: onDrop
         });
+        function updateEvalBar(evalValue) {
+            let percent;
+
+            let clamped = Math.max(-5, Math.min(5, evalValue));
+
+            percent = ((clamped + 5) / 10) * 100;
+
+            document.getElementById("eval-bar").style.height = percent + "%";
+        }
+        function evaluatePosition(fen) {
+            engine.postMessage("position fen " + fen);
+            engine.postMessage("go depth 15"); // adjust strength
+        }
+        let lastEval = null;
+
+        engine.onmessage = function (event) {
+            const line = event.data;
+
+            if (!line.includes("score")) return;
+
+            let evalValue = null;
+
+            if (line.includes("score cp")) {
+                const match = line.match(/score cp (-?\d+)/);
+                if (match) evalValue = parseInt(match[1]) / 100;
+            }
+
+            if (line.includes("score mate")) {
+                const match = line.match(/score mate (-?\d+)/);
+                if (match) evalValue = match[1] > 0 ? 5 : -5;
+            }
+
+            if (evalValue !== null && evalValue !== lastEval) {
+                lastEval = evalValue;
+
+                document.getElementById("eval").innerText =
+                    typeof evalValue === "number" ? evalValue.toFixed(2) : evalValue;
+
+                updateEvalBar(evalValue);
+            }
+        };
         function updateMoveTable() {
             const tbody = document.getElementById('moveBody');
             tbody.innerHTML = '';
@@ -185,7 +253,7 @@
                 history = history.slice(0, currentIndex + 1);
                 history.push(data.new_board);
                 currentIndex = history.length - 1;
-        
+                evaluatePosition(data.new_board);   
             } catch (error) {
                 console.error('Network error:', error);
                 board.position(oldPosition, false);
