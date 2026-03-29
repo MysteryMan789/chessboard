@@ -151,7 +151,7 @@
             engine.postMessage("go depth 15");
         }
         
-        engine.onmessage = function (event) {
+        engine.onmessage = function(event) {
             const line = event.data;
         
             if (line.includes("score cp")) {
@@ -173,6 +173,10 @@
             // only update when finished
             if (line.startsWith("bestmove")) {
                 if (currentMate !== null) {
+                    let mateScore = currentMate;
+                    if (!isWhiteToMove(currentFen)) {
+                        mateScore = -mateScore;
+                    }
                     let mateText = currentMate > 0 ? `M${currentMate}` : `-M${Math.abs(currentMate)}`;
                     document.getElementById("eval").innerText = mateText;
         
