@@ -90,6 +90,10 @@
 </head>
 <body>
     <div id="board" style="width:400px;"></div>
+    <div id="eval-container">
+        <div id="eval-bar"></div>
+    </div>
+    <div id="eval">0.00</div>
     <button onclick="resetBoard()">Reset Board</button>
     <h3>Move List</h3>
     <table id="moveTable" border="1" cellpadding="5" style="border-collapse:collapse; margin-top:10px;">
@@ -103,10 +107,6 @@
         <tbody id="moveBody">
         </tbody>
     </table>
-    <div id="eval-container">
-        <div id="eval-bar"></div>
-    </div>
-    <div id="eval">0.00</div>
     <button id="pgn-export">Copy PGN to clipboard</button>
     <script>
         let history = [];
