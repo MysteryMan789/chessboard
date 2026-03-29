@@ -113,7 +113,7 @@
         let moves = [];
         let currentIndex = 0;
         const pgnExport = document.getElementById('pgn-export');
-        const engine = new Worker('https://cdn.jsdelivr.net/npm/stockfish@16/stockfish.js');
+        const engine = new Worker('stockfish.js');
         engine.postMessage("uci");
         engine.postMessage("isready");
         let evalText;
@@ -135,7 +135,7 @@
         }
         function evaluatePosition(fen) {
             engine.postMessage("position fen " + fen);
-            engine.postMessage("go depth 15"); // adjust strength
+            engine.postMessage("go depth 15");
         }
         let lastEval = null;
 
@@ -179,7 +179,6 @@
                 whiteCell.textContent = moves[i]?.move || '';
                 blackCell.textContent = moves[i + 1]?.move || '';
         
-                // Allow clicking on a move to jump to that position
                 whiteCell.onclick = () => loadPosition(i);
                 blackCell.onclick = () => loadPosition(i + 1);
         
