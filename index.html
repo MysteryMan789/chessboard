@@ -25,7 +25,7 @@
             width: 30%;
             height: 30%;
             border-radius: 50%;
-            background-color: rgba(20, 85, 30, 0.5); /* green translucent circle */
+            background-color: rgba(20, 85, 30, 0.5);
             position: absolute;
             top: 35%;
             left: 35%;
@@ -146,9 +146,9 @@
         function evaluatePosition(fen) {
             currentFen = fen;
         
-            engine.postMessage("stop"); // stop previous calc
+            engine.postMessage("stop"); 
             engine.postMessage("position fen " + fen);
-            engine.postMessage("go depth 15");
+            engine.postMessage("go movetime 600");
         }
         
         engine.onmessage = function(event) {
