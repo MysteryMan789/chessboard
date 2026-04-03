@@ -316,13 +316,13 @@
         
             let pgn =
         `[Event "Online board simulator"]
-        [Site "https://mysteryman789.github.io/chessboard/"]
-        [Date "${today}"]
-        [White "White"]
-        [Black "Black"]
-        [Result "*"]
+[Site "https://mysteryman789.github.io/chessboard/"]
+[Date "${today}"]
+[White "White"]
+[Black "Black"]
+[Result "*"]
         
-        ${pgnMoves}*`;
+${pgnMoves}*`;
         
             navigator.clipboard.writeText(pgn);
             pgnExport.textContent = "Copied PGN to clipboard!";
