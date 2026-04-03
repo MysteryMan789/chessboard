@@ -174,13 +174,19 @@
             if (line.startsWith("bestmove")) {
                 if (currentMate !== null) {
                     let mateScore = currentMate;
+                
                     if (!isWhiteToMove(currentFen)) {
                         mateScore = -mateScore;
                     }
-                    let mateText = currentMate > 0 ? `M${currentMate}` : `-M${Math.abs(currentMate)}`;
+                
+                    let mateText = mateScore > 0 
+                        ? `M${mateScore}` 
+                        : `-M${Math.abs(mateScore)}`;
+                
                     document.getElementById("eval").innerText = mateText;
-        
-                    updateEvalBar(currentMate > 0 ? 5 : -5);
+                
+                    updateEvalBar(mateScore > 0 ? 5 : -5);
+                    }    
                 } 
                 else if (currentEval !== null) {
                     let evalToShow = currentEval;
